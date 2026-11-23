@@ -1,0 +1,23 @@
+node_modules/
+.env
+.env.local
+backend/uploads/**
+!backend/uploads/.gitkeep
+frontend/dist/
+*.log
+.DS_Store
+
+# Datos personales del padrón de empleados (no se sube a git)
+empleados_isp.xlsx
+empleados_activos_*.xlsx
+backend/src/db/empleados_isp.xlsx
+backend/src/db/empleados_isp.json
+backend/src/db/passwords_temporales.csv
+
+# Respaldos de la base de datos (traen datos personales; se copian al servidor a mano)
+*_backup.sql
+respaldos/
+
+# Configuración propia del servidor (se crea allá, no en la laptop)
+web.config
+logs/
