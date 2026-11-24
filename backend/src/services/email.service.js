@@ -146,7 +146,23 @@ async function send({ to, subject, html, tipo, solicitudId }) {
   }
 }
 
-export function notificarNuevaSolicitud(solicitud) {
+// Avisos para administración: a todos los administradores activos con correo en su cuenta,
+// más los correos extra de ADMIN_NOTIFY_EMAILS (si se configuró alguno).
+async function destinatariosAdmin() {
+  let correos = [];
+  try {
+    const { rows } = await pool.query(
+      `SELECT email FROM usuarios WHERE rol = 'admin' AND activo = true AND email IS NOT NULL`
+    );
+    correos = rows.map((r) => r.email.trim().toLowerCase());
+  } catch (err) {
+    console.error('Error obteniendo correos de administradores:', err.message);
+  }
+  const extra = env.adminNotifyEmails.map((e) => e.toLowerCase());
+  return [...new Set([...correos, ...extra])].filter(Boolean);
+}
+
+export async function notificarNuevaSolicitud(solicitud) {
   const html = plantillaCorreo({
     badge: { texto: 'Nueva solicitud', bg: '#E0F5F5', color: '#00807C' },
     titulo: 'Nueva solicitud de infraestructura',
@@ -159,7 +175,7 @@ export function notificarNuevaSolicitud(solicitud) {
     ctaUrl: `${env.frontendUrl}/solicitudes`,
   });
   return send({
-    to: env.adminNotifyEmails,
+    to: await destinatariosAdmin(),
     subject: `Nueva solicitud: ${solicitud.nombre_solicitante} (${solicitud.area})`,
     html,
     tipo: 'nueva_solicitud',
@@ -167,7 +183,7 @@ export function notificarNuevaSolicitud(solicitud) {
   });
 }
 
-function notificarRecordatorio(solicitud, diasRestantes) {
+async function notificarRecordatorio(solicitud, diasRestantes) {
   const vencida = diasRestantes < 0;
   const cuando = vencida
     ? `venció hace ${Math.abs(diasRestantes)} día(s)`
@@ -193,7 +209,7 @@ function notificarRecordatorio(solicitud, diasRestantes) {
   });
 
   return send({
-    to: env.adminNotifyEmails,
+    to: await destinatariosAdmin(),
     subject: `Recordatorio: ${(solicitud.titulo || solicitud.nombre_solicitante).slice(0, 80)} (${solicitud.area}) ${cuando}`,
     html,
     tipo: 'recordatorio',
