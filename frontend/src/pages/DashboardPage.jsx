@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  LayoutDashboard, Clock3, Activity, PauseCircle, CheckCircle2, XCircle, AlertTriangle, ArrowRight,
+  LayoutDashboard, Clock3, Activity, PauseCircle, CheckCircle2, XCircle, AlertTriangle, ArrowRight, ListChecks,
 } from 'lucide-react';
 import Layout from '../components/Layout/Layout.jsx';
 import BarChart from '../components/Charts/BarChart.jsx';
@@ -38,7 +38,7 @@ function fechaCortaLocal(fechaISO) {
 }
 
 export default function DashboardPage() {
-  const [resumen, setResumen] = useState({ pendientes: 0, aprobadas: 0, pausadas: 0, completadas: 0, rechazadas: 0 });
+  const [resumen, setResumen] = useState({ total: 0, pendientes: 0, aprobadas: 0, pausadas: 0, completadas: 0, rechazadas: 0 });
   const [porArea, setPorArea] = useState([]);
   const [porSemana, setPorSemana] = useState([]);
   const [alertas, setAlertas] = useState([]);
@@ -54,6 +54,7 @@ export default function DashboardPage() {
         api.get('/api/solicitudes/prioridad'),
       ]);
       setResumen({
+        total: stats.porEstado.total,
         pendientes: stats.porEstado.pendientes,
         aprobadas: stats.porEstado.aprobadas_activas,
         pausadas: stats.porEstado.pausadas,
@@ -99,7 +100,8 @@ export default function DashboardPage() {
         </Link>
       </div>
 
-      <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
+        <StatCard to="/solicitudes" label="Total de actividades" valor={resumen.total} icon={ListChecks} accent={{ bar: 'bg-isp-navyDark', text: 'text-isp-navy' }} />
         <StatCard to="/solicitudes?filtro=pendientes" label="Pendientes por revisar" valor={resumen.pendientes} icon={Clock3} accent={{ bar: 'bg-amber-400', text: 'text-amber-600' }} />
         <StatCard to="/solicitudes?filtro=en_curso" label="Aprobadas activas" valor={resumen.aprobadas} icon={Activity} accent={{ bar: 'bg-isp-teal', text: 'text-isp-teal' }} />
         <StatCard to="/solicitudes?filtro=pausadas" label="En pausa" valor={resumen.pausadas} icon={PauseCircle} accent={{ bar: 'bg-sky-400', text: 'text-sky-500' }} />

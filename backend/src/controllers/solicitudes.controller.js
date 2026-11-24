@@ -545,6 +545,7 @@ export async function alertas(req, res) {
 export async function estadisticas(req, res) {
   const porEstado = await pool.query(
     `SELECT
+       COUNT(*)::int AS total,
        COUNT(*) FILTER (WHERE estado = 'pendiente')::int AS pendientes,
        COUNT(*) FILTER (WHERE estado = 'aprobada' AND completada = false AND pausada = false)::int AS aprobadas_activas,
        COUNT(*) FILTER (WHERE estado = 'aprobada' AND completada = false AND pausada = true)::int AS pausadas,
