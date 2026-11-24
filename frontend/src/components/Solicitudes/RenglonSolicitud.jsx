@@ -40,7 +40,8 @@ export default function RenglonSolicitud({ solicitud, expandido, resaltado, onTo
         className={`flex items-center gap-3 px-3 py-2.5 select-none ${arrastre ? 'cursor-grab active:cursor-grabbing' : 'cursor-pointer'}`}
       >
         {arrastre && (
-          <span className="text-slate-400 hover:text-isp-teal shrink-0" title="Arrastra para cambiar el orden">
+          // En pantallas táctiles no se puede arrastrar; ahí la prioridad se cambia al abrir el renglón.
+          <span className="text-slate-400 hover:text-isp-teal shrink-0 [@media(pointer:coarse)]:hidden" title="Arrastra para cambiar el orden">
             <GripVertical size={16} />
           </span>
         )}
@@ -70,26 +71,29 @@ export default function RenglonSolicitud({ solicitud, expandido, resaltado, onTo
               <UserRound size={11} /> {solicitud.responsable_nombre || 'Sin responsable'}
             </span>
             {deAdmin && <span className="text-[11px] text-slate-400">· {solicitud.area}</span>}
-            <span className="md:hidden">
-              <EsperaInfo solicitud={solicitud} />
-            </span>
+          </div>
+          <div className="lg:hidden flex items-center gap-x-2 gap-y-0.5 flex-wrap mt-0.5">
+            {activa && <span className="sm:hidden text-[11px] font-semibold text-slate-600">{solicitud.avance ?? 0}% avance</span>}
+            {rango && <span className="text-[11px] text-slate-500">{rango}</span>}
+            {sinFecha && <span className="text-[11px] text-slate-400 italic">Sin fecha compromiso</span>}
+            <EsperaInfo solicitud={solicitud} />
           </div>
         </div>
 
-        <div className="hidden md:flex flex-col items-end gap-0.5 w-60 shrink-0 text-right">
+        <div className="hidden lg:flex flex-col items-end gap-0.5 w-56 shrink-0 text-right">
           {rango && <span className="text-[11px] text-slate-500 truncate max-w-full">{rango}</span>}
           {sinFecha && <span className="text-[11px] text-slate-400 italic">Sin fecha compromiso</span>}
           <EsperaInfo solicitud={solicitud} />
         </div>
 
         {activa && (
-          <div className="hidden sm:flex items-center gap-2 w-28 shrink-0">
+          <div className="hidden sm:flex items-center gap-2 w-24 lg:w-28 shrink-0">
             <ProgressBar value={solicitud.avance ?? 0} colorClass={estilo.bar} pausada={solicitud.pausada} height="h-1.5" />
             <span className="text-[11px] font-semibold text-slate-500 w-8 text-right">{solicitud.avance ?? 0}%</span>
           </div>
         )}
 
-        <span className="hidden sm:inline-flex shrink-0">
+        <span className="hidden lg:inline-flex shrink-0">
           <EstadoBadge solicitud={solicitud} />
         </span>
         <ChevronDown size={16} className={`shrink-0 text-slate-400 transition-transform ${expandido ? 'rotate-180' : ''}`} />

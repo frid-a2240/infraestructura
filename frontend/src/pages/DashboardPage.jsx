@@ -17,14 +17,14 @@ function StatCard({ label, valor, accent, icon: Icon, to }) {
     <Link
       to={to}
       title={`Ver ${label.toLowerCase()}`}
-      className="group relative block bg-white rounded-2xl border border-slate-200 p-5 pl-6 overflow-hidden shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-isp-teal"
+      className="group relative block bg-white rounded-2xl border border-slate-200 p-4 pl-5 sm:p-5 sm:pl-6 overflow-hidden shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-isp-teal"
     >
       <span className={`absolute left-0 top-0 bottom-0 w-1.5 ${accent.bar}`} />
-      <div className="flex items-center justify-between">
-        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">{label}</p>
-        <Icon size={16} className={accent.text} />
+      <div className="flex items-start justify-between gap-2">
+        <p className="text-[11px] sm:text-xs font-semibold text-slate-500 uppercase tracking-wide leading-tight">{label}</p>
+        <Icon size={16} className={`shrink-0 ${accent.text}`} />
       </div>
-      <p className={`text-3xl font-bold mt-1 ${accent.text}`}>{valor}</p>
+      <p className={`text-2xl sm:text-3xl font-bold mt-1 ${accent.text}`}>{valor}</p>
       <span className="mt-1 inline-flex items-center gap-1 text-[11px] font-semibold text-slate-400 group-hover:text-isp-teal transition-colors">
         Ver <ArrowRight size={11} />
       </span>
@@ -100,7 +100,7 @@ export default function DashboardPage() {
         </Link>
       </div>
 
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
+      <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4 mb-6">
         <StatCard to="/solicitudes" label="Total de actividades" valor={resumen.total} icon={ListChecks} accent={{ bar: 'bg-isp-navyDark', text: 'text-isp-navy' }} />
         <StatCard to="/solicitudes?filtro=pendientes" label="Pendientes por revisar" valor={resumen.pendientes} icon={Clock3} accent={{ bar: 'bg-amber-400', text: 'text-amber-600' }} />
         <StatCard to="/solicitudes?filtro=en_curso" label="Aprobadas activas" valor={resumen.aprobadas} icon={Activity} accent={{ bar: 'bg-isp-teal', text: 'text-isp-teal' }} />
@@ -113,7 +113,7 @@ export default function DashboardPage() {
         <p className="text-slate-400 text-sm">Cargando…</p>
       ) : (
         <>
-          <div className="grid lg:grid-cols-2 gap-6 mb-6">
+          <div className="grid lg:grid-cols-2 gap-6 mb-6 *:min-w-0">
             <SectionCard
               title="Alertas por fecha"
               subtitle="Aprobadas que están por vencer o ya vencieron."
@@ -122,7 +122,7 @@ export default function DashboardPage() {
               {alertas.length === 0 ? (
                 <EmptyState icon={CheckCircle2} title="Todo en orden" subtitle="No hay actividades por vencer ni vencidas." />
               ) : (
-                <div className="space-y-1.5">
+                <div className="space-y-1.5 max-h-96 overflow-y-auto pr-1">
                   {alertas.map((a) => (
                     <Link
                       key={a.id}
@@ -150,15 +150,15 @@ export default function DashboardPage() {
               {pausadas.length === 0 ? (
                 <EmptyState icon={Activity} title="Nada en pausa" subtitle="Todas las actividades activas siguen en curso." />
               ) : (
-                <div className="space-y-1.5">
+                <div className="space-y-1.5 max-h-96 overflow-y-auto pr-1">
                   {pausadas.map((p) => (
                     <Link
                       key={p.id}
                       to={`/solicitudes?id=${p.id}`}
                       className="flex items-center justify-between gap-2 rounded-lg px-3 py-2 text-sm border bg-sky-50 border-sky-200 text-sky-700"
                     >
-                      <span className="min-w-0 truncate">
-                        <span className="font-medium">{tituloDe(p)} · {p.area}</span>
+                      <span className="min-w-0">
+                        <span className="font-medium block truncate">{tituloDe(p)} · {p.area}</span>
                         {p.motivo_pausa && <span className="text-xs block text-sky-600/80 truncate">{p.motivo_pausa}</span>}
                       </span>
                       <PrioridadBadge prioridad={p.prioridad} />
@@ -175,7 +175,7 @@ export default function DashboardPage() {
             <TrendArea items={porSemana} color="#00AFAA" />
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-6">
+          <div className="grid lg:grid-cols-2 gap-6 *:min-w-0">
             <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-6">
               <h3 className="text-lg font-bold text-isp-navy mb-1">Distribución por estado</h3>
               <p className="text-sm text-slate-500 mb-4">Todas las solicitudes registradas.</p>

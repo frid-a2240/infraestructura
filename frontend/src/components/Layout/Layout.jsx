@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, LayoutGrid, CalendarDays, Bell, History, Users, Home, PlusCircle, LogOut, Menu, X as CloseIcon,
   FileBarChart2,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { api } from '../../api/client.js';
+import { esGestorUsuarios } from '../../utils/permisos.js';
 
-const NAV_ADMIN_SIN_USUARIOS = [
+const NAV_ADMIN = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/solicitudes', label: 'Tablero', icon: LayoutGrid },
   { to: '/calendario', label: 'Calendario', icon: CalendarDays },
@@ -16,17 +17,12 @@ const NAV_ADMIN_SIN_USUARIOS = [
   { to: '/historial', label: 'Historial', icon: History },
 ];
 const ITEM_USUARIOS = { to: '/usuarios', label: 'Usuarios', icon: Users };
-const NAV_ADMIN = NAV_ADMIN_SIN_USUARIOS;
 
 const NAV_OTROS = [
   { to: '/', label: 'Inicio', icon: Home },
   { to: '/solicitudes/nueva', label: 'Nueva solicitud', icon: PlusCircle },
   { to: '/calendario', label: 'Calendario', icon: CalendarDays, roles: ['colaborador'] },
 ];
-
-// Excepción puntual: el área de sistemas administra el módulo de Usuarios
-// aunque su rol en el sistema sea colaborador.
-const GESTOR_USUARIOS_ID = '204862';
 
 function inicialesDe(nombre) {
   if (!nombre) return '?';
@@ -42,14 +38,13 @@ export default function Layout({ children }) {
   const { usuario, logout } = useAuth();
   const navigate = useNavigate();
   const esAdmin = usuario?.rol === 'admin';
-  const esGestorUsuarios = usuario?.numero_empleado === GESTOR_USUARIOS_ID;
   const [noLeidas, setNoLeidas] = useState(0);
   const [menuAbierto, setMenuAbierto] = useState(false);
 
   const items = esAdmin
     ? [...NAV_ADMIN]
     : NAV_OTROS.filter((item) => !item.roles || item.roles.includes(usuario?.rol));
-  if (esGestorUsuarios) {
+  if (esGestorUsuarios(usuario)) {
     items.push(ITEM_USUARIOS);
   }
 
@@ -69,7 +64,7 @@ export default function Layout({ children }) {
   };
 
   return (
-    <div className="h-screen flex bg-slate-100 overflow-hidden">
+    <div className="h-dvh flex bg-slate-100 overflow-hidden">
       {menuAbierto && (
         <div
           className="fixed inset-0 bg-black/40 z-30 lg:hidden"
@@ -154,10 +149,19 @@ export default function Layout({ children }) {
           </button>
           <img src={`${import.meta.env.BASE_URL}isotipo.png`} alt="ISP" className="w-6 h-6 object-contain" />
           <span className="font-bold text-isp-navy text-sm">Infraestructura</span>
-          {noLeidas > 0 && (
-            <span className="ml-auto min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center">
-              {noLeidas > 99 ? '99+' : noLeidas}
-            </span>
+          {esAdmin && (
+            <Link
+              to="/notificaciones"
+              className="ml-auto relative p-2 -mr-2 text-isp-navy"
+              aria-label={`Notificaciones${noLeidas > 0 ? `: ${noLeidas} urgentes` : ''}`}
+            >
+              <Bell size={20} />
+              {noLeidas > 0 && (
+                <span className="absolute top-0.5 right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center">
+                  {noLeidas > 99 ? '99+' : noLeidas}
+                </span>
+              )}
+            </Link>
           )}
         </div>
 

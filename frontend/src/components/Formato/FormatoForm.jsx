@@ -1,16 +1,11 @@
 import { useState } from 'react';
-import { Send, Flame, Equal, Minus } from 'lucide-react';
+import { Send } from 'lucide-react';
 import { api } from '../../api/client.js';
 import { useAuth } from '../../context/AuthContext.jsx';
 import SelectorFotos from '../UI/SelectorFotos.jsx';
+import { OPCIONES_PRIORIDAD as PRIORIDADES } from '../UI/Badge.jsx';
 
 const MAX_FOTOS = 5;
-
-export const PRIORIDADES = [
-  { value: 'alta', label: 'Alta', icon: Flame, cls: 'border-rose-200 bg-rose-50 text-rose-700' },
-  { value: 'media', label: 'Media', icon: Equal, cls: 'border-amber-200 bg-amber-50 text-amber-700' },
-  { value: 'baja', label: 'Baja', icon: Minus, cls: 'border-sky-200 bg-sky-50 text-sky-700' },
-];
 
 export default function FormatoForm({ onCreada }) {
   const { usuario } = useAuth();

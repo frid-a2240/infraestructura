@@ -17,8 +17,8 @@ export default function CalendarioPage() {
 
   return (
     <Layout>
-      <h1 className="text-2xl font-bold text-isp-navy mb-1">Calendario y avance</h1>
-      <p className="text-sm text-slate-500 mb-4">
+      <h1 className="text-2xl font-bold text-isp-navy mb-3 sm:mb-1">Calendario y avance</h1>
+      <p className="hidden sm:block text-sm text-slate-500 mb-4">
         Cada solicitud aprobada que sigue en curso aparece en todos los días desde su fecha de inicio hasta su fecha de
         terminación; al completarse deja de mostrarse. Cambia a la vista de Gantt para ver el avance de cada actividad en
         el tiempo.

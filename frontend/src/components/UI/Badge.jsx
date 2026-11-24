@@ -56,6 +56,8 @@ export const PRIORIDAD_STYLES = {
   },
 };
 
+export const OPCIONES_PRIORIDAD = ['alta', 'media', 'baja'].map((value) => ({ value, ...PRIORIDAD_STYLES[value] }));
+
 export function PrioridadBadge({ prioridad }) {
   const estilo = PRIORIDAD_STYLES[prioridad] || PRIORIDAD_STYLES.media;
   return (

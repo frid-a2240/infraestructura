@@ -2,9 +2,11 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import express from 'express';
+import compression from 'compression';
 import cors from 'cors';
 import helmet from 'helmet';
 import { env } from './config/env.js';
+import { capturarErroresAsync } from './utils/capturarErroresAsync.js';
 import { UPLOADS_ROOT } from './middleware/upload.js';
 import authRoutes from './routes/auth.routes.js';
 import solicitudesRoutes from './routes/solicitudes.routes.js';
@@ -36,15 +38,17 @@ app.use(
     },
   })
 );
+app.use(compression());
 app.use(cors({ origin: env.frontendUrl }));
 app.use(express.json());
-app.use(`${BASE}/uploads/solicitudes`, express.static(UPLOADS_ROOT));
+// Las fotos nunca cambian (cada una tiene nombre único), así que el navegador las puede guardar.
+app.use(`${BASE}/uploads/solicitudes`, express.static(UPLOADS_ROOT, { maxAge: '30d', immutable: true }));
 
-app.use(`${BASE}/api/auth`, authRoutes);
-app.use(`${BASE}/api/solicitudes`, solicitudesRoutes);
-app.use(`${BASE}/api/usuarios`, usuariosRoutes);
-app.use(`${BASE}/api/notificaciones`, notificacionesRoutes);
-app.use(`${BASE}/api/reportes`, reportesRoutes);
+app.use(`${BASE}/api/auth`, capturarErroresAsync(authRoutes));
+app.use(`${BASE}/api/solicitudes`, capturarErroresAsync(solicitudesRoutes));
+app.use(`${BASE}/api/usuarios`, capturarErroresAsync(usuariosRoutes));
+app.use(`${BASE}/api/notificaciones`, capturarErroresAsync(notificacionesRoutes));
+app.use(`${BASE}/api/reportes`, capturarErroresAsync(reportesRoutes));
 
 app.get(`${BASE}/api/health`, (req, res) => res.json({ ok: true }));
 
@@ -54,8 +58,14 @@ if (env.produccion && fs.existsSync(FRONTEND_DIST)) {
   app.use(`${BASE}/api`, (req, res) => res.status(404).json({ detail: 'Ruta no encontrada' }));
   // Express trata "/infraestructura" y "/infraestructura/" igual; solo se redirige la que no trae la barra.
   if (BASE) app.get(BASE, (req, res, next) => (req.path === BASE ? res.redirect(`${BASE}/`) : next()));
-  app.use(`${BASE}/`, express.static(FRONTEND_DIST, { index: false }));
-  app.get(`${BASE}/*`, (req, res) => res.sendFile(path.join(FRONTEND_DIST, 'index.html')));
+  // Los archivos de assets/ llevan un hash en el nombre: se pueden guardar en caché un año.
+  // index.html no, para que al actualizar el sistema el navegador tome la versión nueva.
+  app.use(`${BASE}/assets`, express.static(path.join(FRONTEND_DIST, 'assets'), { maxAge: '1y', immutable: true }));
+  app.use(`${BASE}/`, express.static(FRONTEND_DIST, { index: false, maxAge: '1d' }));
+  app.get(`${BASE}/*`, (req, res) => {
+    res.set('Cache-Control', 'no-cache');
+    res.sendFile(path.join(FRONTEND_DIST, 'index.html'));
+  });
 }
 
 app.use((err, req, res, next) => {
@@ -71,6 +81,13 @@ app.use((err, req, res, next) => {
   }
   return res.status(500).json({ detail: 'Error interno del servidor' });
 });
+
+// Red de seguridad: un error async que se escape (por ejemplo, al armar un correo) se registra
+// en el log en vez de tumbar el sistema completo.
+process.on('unhandledRejection', (err) => {
+  console.error('Error no atrapado:', err);
+});
+
 // eslint no funciona con express, por lo que no se desactiva la regla para esta línea
 app.listen(env.port, () => {
   console.log(`Backend ISP Infraestructura escuchando en http://localhost:${env.port}${BASE}`);

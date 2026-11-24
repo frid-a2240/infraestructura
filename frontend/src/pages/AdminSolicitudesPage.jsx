@@ -216,7 +216,7 @@ export default function AdminSolicitudesPage() {
             <LayoutGrid size={22} className="text-isp-navy" />
             <h1 className="text-2xl font-bold text-isp-navy">Tablero de solicitudes</h1>
           </div>
-          <p className="text-sm text-slate-500">
+          <p className="hidden sm:block text-sm text-slate-500">
             Cada solicitud o actividad va en su propio renglón, agrupadas por prioridad. Haz clic en un renglón para ver el
             detalle y aprobar, asignar responsable, modificar fechas, pausar o completar.
           </p>
@@ -316,7 +316,7 @@ export default function AdminSolicitudesPage() {
             />
           ))}
           {filtro === 'todas' && !q && !soloMias && (
-            <p className="text-[11px] text-slate-400 px-1">
+            <p className="text-[11px] text-slate-400 px-1 [@media(pointer:coarse)]:hidden">
               Arrastra un renglón aprobado desde el ícono ⋮⋮: suéltalo en otra posición para cambiar su orden, o en otra
               sección para cambiarle la prioridad.
             </p>

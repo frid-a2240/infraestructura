@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Activity, PauseCircle, X } from 'lucide-react';
 import { api } from '../../api/client.js';
 import { useAuth } from '../../context/AuthContext.jsx';
-import { PRIORIDADES } from '../Formato/FormatoForm.jsx';
+import { OPCIONES_PRIORIDAD as PRIORIDADES } from '../UI/Badge.jsx';
 import SelectorFotos from '../UI/SelectorFotos.jsx';
 import RangoFechas from './RangoFechas.jsx';
 import { hoyISO, esFechaISO } from '../../utils/fechas.js';

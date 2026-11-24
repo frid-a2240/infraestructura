@@ -37,7 +37,7 @@ export default function SelectorFotos({ fotos, onChange, max = 5, obligatoria = 
 
   return (
     <div>
-      <label className="flex items-center gap-1.5 text-xs font-semibold text-slate-600 uppercase tracking-wide mb-1">
+      <label className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-xs font-semibold text-slate-600 uppercase tracking-wide mb-1">
         <ImageIcon size={14} /> Fotos {obligatoria ? 'de evidencia' : ''}
         {obligatoria && <span className="text-red-500">*</span>}
         <span className="normal-case font-normal text-slate-400">
