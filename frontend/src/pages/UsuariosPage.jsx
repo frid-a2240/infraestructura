@@ -13,6 +13,7 @@ export default function UsuariosPage() {
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState('');
   const [passwordRevelada, setPasswordRevelada] = useState(null); // { id, password }
+  const [confirmarId, setConfirmarId] = useState(null);
 
   const cargar = useCallback(async () => {
     setCargando(true);
@@ -46,6 +47,7 @@ export default function UsuariosPage() {
   const regenerarPassword = async (id) => {
     setError('');
     setPasswordRevelada(null);
+    setConfirmarId(null);
     try {
       const { data } = await api.post(`/api/usuarios/${id}/regenerar-password`);
       setPasswordRevelada({ id, password: data.password_temporal });
@@ -59,18 +61,17 @@ export default function UsuariosPage() {
   const ispRegistrados = useMemo(() => isp.filter((u) => !u.primera_vez), [isp]);
   const invitados = useMemo(() => usuarios.filter((u) => u.rol === 'invitado'), [usuarios]);
 
-  const listaBase = tab === 'isp' ? (mostrarTodos ? isp : ispRegistrados) : invitados;
-
   const filtrados = useMemo(() => {
     const q = busqueda.trim().toLowerCase();
-    if (!q) return listaBase;
-    return listaBase.filter(
+    const todos = tab === 'isp' ? isp : invitados;
+    if (!q) return tab === 'isp' && !mostrarTodos ? ispRegistrados : todos;
+    return todos.filter(
       (u) =>
         u.nombre.toLowerCase().includes(q) ||
         (u.numero_empleado || '').includes(q) ||
         (u.email || '').toLowerCase().includes(q)
     );
-  }, [listaBase, busqueda]);
+  }, [tab, isp, ispRegistrados, invitados, mostrarTodos, busqueda]);
 
   return (
     <Layout>
@@ -79,7 +80,7 @@ export default function UsuariosPage() {
         <h1 className="text-2xl font-bold text-isp-navy">Usuarios</h1>
       </div>
       <p className="text-sm text-slate-500 mb-6">
-        Se muestra solo a quienes ya iniciaron sesión por primera vez. El resto del padrón está precargado pero no ha entrado todavía.
+        Se muestra a quienes ya iniciaron sesión por primera vez. El buscador también encuentra a quienes todavía no han entrado.
       </p>
 
       <div className="flex gap-2 mb-4">
@@ -154,9 +155,9 @@ export default function UsuariosPage() {
                       Invitado
                     </span>
                   )}
-                  {tab === 'isp' && u.rol === 'colaborador' && u.primera_vez && (
+                  {tab === 'isp' && u.rol === 'colaborador' && (
                     <button
-                      onClick={() => regenerarPassword(u.id)}
+                      onClick={() => setConfirmarId(u.id)}
                       title="Restablece la contraseña genérica para esta persona"
                       className="flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50"
                     >
@@ -171,6 +172,20 @@ export default function UsuariosPage() {
                   </button>
                 </div>
               </div>
+              {confirmarId === u.id && (
+                <div className="mt-2 flex items-center gap-2 flex-wrap bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-600">
+                  <span>
+                    ¿Restablecer la contraseña de <strong>{u.nombre_corto || u.nombre}</strong>? La que tiene ahora dejará de funcionar.
+                  </span>
+                  <button
+                    onClick={() => regenerarPassword(u.id)}
+                    className="ml-auto px-2.5 py-1 rounded-lg bg-isp-navyDark text-white font-semibold"
+                  >
+                    Sí, restablecer
+                  </button>
+                  <button onClick={() => setConfirmarId(null)} className="text-slate-400">Cancelar</button>
+                </div>
+              )}
               {passwordRevelada?.id === u.id && (
                 <div className="mt-2 flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 text-xs text-amber-800">
                   <span>
