@@ -321,7 +321,7 @@ export default function Login() {
                 </div>
 
                 <div className="ls-info">
-                  ¿Es tu primera vez o te restablecieron la contraseña? Contraseña genérica: <strong>isp2026</strong>
+                  Contraseña genérica: <strong>isp2026</strong>
                 </div>
 
                 {error && <div className="ls-error">{error}</div>}
