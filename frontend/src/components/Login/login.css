@@ -13,8 +13,7 @@
 .ls-left {
   background: #ffffff;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  min-height: 0;
   overflow-y: auto;
 }
 
@@ -32,7 +31,9 @@
 .ls-inner {
   width: 100%;
   max-width: 460px;
-  padding: 3rem 2.5rem;
+  /* margin auto centra sin recortar la parte de arriba cuando el contenido no cabe */
+  margin: auto;
+  padding: 2rem 2.5rem;
 }
 
 .ls-brand {
@@ -254,10 +255,13 @@
 @media (max-width: 768px) {
   .ls-root {
     grid-template-columns: 1fr;
-    grid-template-rows: 200px 1fr;
+    grid-template-rows: 120px minmax(0, 1fr);
   }
   .ls-left { order: 2; }
-  .ls-right { order: 1; height: 200px; }
-  .ls-inner { padding: 2rem 1.5rem; }
-  .ls-photo-title { font-size: 20px; }
+  .ls-right { order: 1; height: 120px; }
+  .ls-inner { padding: 1.25rem 1.5rem; }
+  .ls-brand { margin-bottom: 1rem; padding-bottom: 1rem; }
+  .ls-logo { width: 48px; }
+  .ls-subtitle { margin-bottom: 1.25rem; }
+  .ls-footer { margin-top: 1.25rem; }
 }

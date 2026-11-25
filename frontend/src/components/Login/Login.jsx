@@ -320,6 +320,10 @@ export default function Login() {
                   </div>
                 </div>
 
+                <div className="ls-info">
+                  ¿Es tu primera vez o te restablecieron la contraseña? Contraseña genérica: <strong>isp2026</strong>
+                </div>
+
                 {error && <div className="ls-error">{error}</div>}
 
                 <button className="ls-btn" onClick={handleLogin} disabled={loading}>
